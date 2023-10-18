@@ -1,25 +1,26 @@
-import APIFeaturesInterface from '../interfaces/apiFeatures.Interface';
+import APIFeaturesInterface from '../../interfaces/apiFeatures.Interface';
 import IQuery from 'interfaces/query.Interface';
+import IPayload from 'src/interfaces/payload.Interface';
 
 class APIFeatures implements APIFeaturesInterface {
   query: Partial<IQuery>;
-  payload: any;
+  payload: Partial<IPayload> = {};
 
-  constructor(query: Partial<IQuery>, payload: any) {
+  constructor(query: Partial<IQuery>) {
     this.query = query;
-    this.payload = payload;
   }
 
-  filter() {
+  filter(): this {
     const queryObj = { ...this.query };
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach((el) => delete queryObj[el]);
 
     // 1B)Advanced Filtering
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+    // let queryStr = JSON.stringify(queryObj);
+    // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
-    this.payload.where = JSON.parse(queryStr);
+    // this.payload.where = JSON.parse(queryStr);
+    this.payload.where = queryObj;
     return this;
   }
 
