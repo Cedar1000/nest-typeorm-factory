@@ -1,9 +1,8 @@
 interface IPayload {
   skip: number;
   take: number;
-  order: { [key: string]: 'ASC' | 'DESC' };
-  page: string;
-  where: { [key: string]: any };
+  order: { [key: string]: string };
+  where: Partial<[{ [key: string]: any }]>;
   select: string[];
 }
 
