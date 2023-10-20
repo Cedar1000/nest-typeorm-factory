@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
 } from '@nestjs/common';
+
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -39,6 +40,6 @@ export class PostController {
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    await this.postService.remove(id);
+    return this.postService.remove(id);
   }
 }

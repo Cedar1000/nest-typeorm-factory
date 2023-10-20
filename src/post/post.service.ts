@@ -4,7 +4,14 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Repository } from 'typeorm';
 import { Post } from './entities/post.entity';
-import { getAll, getOne, updateOneOne } from '../utils/handlerFactory';
+import {
+  createOne,
+  getAll,
+  getOne,
+  updateOneOne,
+  deleteOne,
+} from '../utils/handlerFactory';
+
 import IQuery from 'interfaces/query.Interface';
 
 @Injectable()
@@ -14,8 +21,7 @@ export class PostService {
   ) {}
 
   async create(createPostDto: CreatePostDto) {
-    const post = this.postRepository.create(createPostDto);
-    return this.postRepository.save(post);
+    return createOne(this.postRepository, createPostDto);
   }
 
   async findAll(query: Partial<IQuery>) {
@@ -27,10 +33,10 @@ export class PostService {
   }
 
   update(id: string, updatePostDto: UpdatePostDto) {
-    return updateOneOne(this.postRepository, { id }, updatePostDto);
+    return updateOneOne(this.postRepository, id, updatePostDto);
   }
 
   remove(id: string) {
-    return this.postRepository.delete({ id });
+    return deleteOne(this.postRepository, id);
   }
 }
