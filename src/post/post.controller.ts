@@ -29,12 +29,12 @@ export class PostController {
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    await this.postService.findOne(id);
+    return this.postService.findOne(id);
   }
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    await this.postService.update(id, updatePostDto);
+    return this.postService.update(id, updatePostDto);
   }
 
   @Delete(':id')

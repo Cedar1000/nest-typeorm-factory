@@ -16,24 +16,18 @@ export const getAll = (Repo: any, query: Partial<IQuery>) => {
   return Repo.find(payload);
 };
 
-// exports.getOne = (Model, popOptions) =>
-//   catchAsync(async (req, res, next) => {
-//     let query = Model.findById(req.params.id);
-//     if (popOptions) query = query.populate(popOptions);
-//     const doc = await query;
+export const getOne = (Repo: any, id: string) => {
+  return Repo.findOneBy({ id });
+};
 
-//     if (!doc) {
-//       return next(new AppError('No document found with that ID', 404));
-//     }
+export const createOne = (Repo: any, payload: any) => {
+  const data = Repo.create(payload);
+  return Repo.save(data);
+};
 
-//     doc.canReview = req.body.canReview;
-
-//     res.status(200).json({
-//       status: 'success',
-//       doc,
-//       canReview: req.body.canReview,
-//     });
-//   });
+export const updateOneOne = (Repo: any, filter: any, payload: any) => {
+  return Repo.update(filter, payload);
+};
 
 // exports.deleteOne = (Model) => {
 //   return catchAsync(async (req, res, next) => {
