@@ -79,7 +79,6 @@ class APIFeatures implements APIFeaturesInterface {
       const searches = this.query.search.split('-');
 
       searches.forEach((el) => {
-        console.log('el', el);
         const [field, term] = el.split(',');
         this.payload.where.push({ [field]: Like(`%${term}%`) });
       });
