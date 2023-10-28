@@ -1,6 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PostController } from './post.controller';
 import { PostService } from './post.service';
+// import { Post } from './entities/post.entity';
+
+// import TypeOrmSQLITETestingModule from '../utils/TypeOrmSQLITETestingModule';
 
 //mocks
 import mockPostService from './mocks/post.service.mock';
@@ -11,6 +14,7 @@ describe('PostController', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      // imports: [...TypeOrmSQLITETestingModule(Post)],
       controllers: [PostController],
       providers: [PostService],
     })

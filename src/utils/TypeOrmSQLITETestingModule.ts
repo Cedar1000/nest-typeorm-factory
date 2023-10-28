@@ -1,14 +1,19 @@
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-const TypeOrmSQLITETestingModule = (entity: any) => [
+const TypeOrmPostgreSQLTestingModule = (entity: any) => [
   TypeOrmModule.forRoot({
-    type: 'better-sqlite3',
-    database: ':memory:',
-    dropSchema: true,
+    type: 'postgres', // Change the database type to PostgreSQL
+    host: 'localhost', // Specify your PostgreSQL host
+    port: 5432, // Specify your PostgreSQL port
+    username: 'postgres', // Specify your PostgreSQL username
+    password: 'postgres12234', // Specify your PostgreSQL password
+    database: 'test', // Specify your PostgreSQL database name
     entities: [entity],
-    synchronize: true,
+    synchronize: true, // This option should be used with caution in production
+    autoLoadEntities: true,
+    migrationsRun: true,
   }),
   TypeOrmModule.forFeature([entity]),
 ];
 
-export default TypeOrmSQLITETestingModule;
+export default TypeOrmPostgreSQLTestingModule;
