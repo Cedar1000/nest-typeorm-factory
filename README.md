@@ -1,73 +1,139 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+# Package Name: `nestjs-handler-factory`
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+The `nestjs-handler-factory` package provides a set of utility functions for handling common operations in a NestJS application. These operations include retrieving data from a database, creating new records, updating records, and deleting records. The package is designed to work seamlessly with NestJS and is written in TypeScript.
 
-## Installation
+## Example Usage
 
-```bash
-$ npm install
+### Importing Required Dependencies
+
+First, you need to import the package and any necessary interfaces.
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
+import { Repository } from 'typeorm';
+import { Post } from './entities/post.entity';
+import {
+  createOne,
+  getAll,
+  getOne,
+  updateOneOne,
+  deleteOne,
+} from 'handlerFactory';
+import IQuery from 'interfaces/query.Interface';
 ```
 
-## Running the app
+1. `@nestjs/common` and `@nestjs/typeorm` are imports from the NestJS framework, used for creating a service and working with TypeORM repositories.
+2. `CreatePostDto` and `UpdatePostDto` are DTO (Data Transfer Object) classes used for validating and transforming data when creating and updating posts.
+3. `Repository` is imported from TypeORM and represents the repository for the `Post` entity.
+4. `Post` represents the entity for posts, imported from your application.
+5. `createOne`, `getAll`, `getOne`, `updateOneOne`, and `deleteOne` are functions imported from the `nestjs-handler-factory` package for handling CRUD operations.
+6. `IQuery` is an interface for query parameters, possibly defined in your application.
 
-```bash
-# development
-$ npm run start
+### Creating a NestJS Service
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```typescript
+@Injectable()
+export class PostService {
+  constructor(@InjectRepository(Post) private postRepository: Repository<Post>) {}
 ```
 
-## Test
+1. `@Injectable()` is a decorator from NestJS, indicating that the `PostService` class is injectable and can be used as a service.
+2. The `constructor` function initializes the `PostService` class. `@InjectRepository(Post)` injects the `Post` repository into the service, making it available for use within the class.
 
-```bash
-# unit tests
-$ npm run test
+### Handling the "create" Operation
 
-# e2e tests
-$ npm run test:e2e
+This function creates a new record in the repository with the provided payload.
 
-# test coverage
-$ npm run test:cov
+```typescript
+async create(createPostDto: CreatePostDto) {
+  return createOne(this.postRepository, createPostDto);
+}
 ```
 
-## Support
+1. The `create` method accepts a `createPostDto` object, which represents the data for creating a new post.
+2. Inside the method, the `createOne` function from the `nestjs-handler-factory` package is used to create a new post record in the repository. The repository and the data to create are passed as arguments to the function.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Handling the "findAll" Operation
 
-## Stay in touch
+This Operation retrieves a list of records from a repository based on the provided query parameters.
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```typescript
+async findAll(query: Partial<IQuery>) {
+  return getAll(this.postRepository, query);
+}
+```
+
+1. The `findAll` method accepts a `query` object of type `Partial<IQuery)`. This object contains query parameters for filtering, sorting, and pagination.
+2. The method uses the `getAll` function from the `nestjs-handler-factory` package to retrieve a list of post records based on the provided query.
+
+### Frontend Usage of the
+
+When integrating your NestJS service with the frontend of your application, you'll need to make API requests with query parameters to customize the data you retrieve. Follow these steps to call query parameters in the frontend:
+
+1. **Construct the API Request**:
+
+   Start by constructing an HTTP request to your NestJS server. The query parameters should be included in this request to customize the data you receive.
+
+2. **Include Query Parameters**:
+
+   Depending on the specific API endpoint and server requirements, you can include query parameters in the URL or request body. For GET requests, append query parameters to the URL like this:
+
+   ```plaintext
+   GET /api/posts?limit=10&page=1&sort=createdAt&fields=title,author&search=keyword
+   ```
+
+### Handling the "findOne" Operation
+
+This function retrieves a single record from a repository by its ID.
+
+```typescript
+findOne(id: string) {
+  return getOne(this.postRepository, id);
+}
+```
+
+1. The `findOne` method accepts an `id` of type `string`, representing the unique identifier of the post to retrieve.
+2. Inside the method, the `getOne` function from the `nestjs-handler-factory` package is used to retrieve a single post record by its ID.
+
+### Handling the "update" Operation
+
+This function updates an existing record in the repository based on its ID.
+
+```typescript
+update(id: string, updatePostDto: UpdatePostDto) {
+  return updateOneOne(this.postRepository, id, updatePostDto);
+}
+```
+
+1. The `update` method accepts an `id` of type `string`, representing the unique identifier of the post to update, and an `updatePostDto` object containing the data to update in the post.
+2. The method uses the `updateOneOne` function from the `nestjs-handler-factory` package to update an existing post record by its ID.
+
+### Handling the "remove" Operation
+
+This function deletes a record from the repository based on its ID.
+
+```typescript
+remove(id: string) {
+  return deleteOne(this.postRepository, id);
+}
+```
+
+1. The `remove` method accepts an `id` of type `string`, representing the unique identifier of the post to delete.
+2. The method uses the `deleteOne` function from the `nestjs-handler-factory` package to remove a post record by its ID.
+
+This explains each section of the code and its purpose within the NestJS service. It demonstrates how the `nestjs-handler-factory` package simplify the implementation of common CRUD operations for the `Post` entity.
+
+## APIFeatures Class
+
+The package also provides an `APIFeatures` class, which is used internally to process and filter query parameters. Users of the package generally do not need to interact directly with this class, but it can be extended or modified as needed.
 
 ## License
 
-Nest is [MIT licensed](LICENSE).
+## Issues and Contributions
+
+If you encounter any issues or have suggestions for improvements, please report them on the GitHub repository: [nestjs-handler-factory](https://github.com/Cedar1000/nestjs-handler-factory/issues).
