@@ -1,7 +1,6 @@
 # compiled output
 /dist
-/test-project/node_modules
-/package/node_modules
+/node_modules
 
 # environment variables
 /.env
