@@ -4,7 +4,7 @@ Here’s a comprehensive documentation for your `nestjs-handler-factory` package
 
 # NestJS Handler Factory Documentation
 
-`nestjs-handler-factory` is a utility package designed to streamline CRUD operations and advanced filtering in NestJS applications that use TypeORM. This package provides convenient handler functions for retrieving, creating, updating, and deleting records, with support for filtering, pagination, and field selection.
+`nestjs-handler-factory` is a utility package designed to streamline CRUD operations and advanced filtering in NestJS applications that use TypeORM. This package provides convenient handler functions for retrieving, creating, updating, and deleting records, with support for filtering, pagination, sorting, field selection and populating inter-table relationships.
 
 ---
 
@@ -46,18 +46,80 @@ Ensure you have TypeORM set up in your project, as it’s required for the packa
 
 Import the package and utilize it within your NestJS service to handle common database operations.
 
+Let's create 2 entities, one for `Post`, the other for `User`
+
+The `User`
+
+```
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Post } from './post.entity';
+
+@Entity()
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  name: string;
+
+  @Column()
+  email: string;
+
+  @OneToMany(() => Post, post => post.user)
+  posts: Post[];
+}
+
+```
+
+The `Post`
+
+```
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { User } from './user.entity';
+
+@Entity()
+export class Post {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  title: string;
+
+  @Column()
+  content: string;
+
+  @Column({ default:0 })
+  reposts: number;
+
+  @Column({ default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
+  @ManyToOne(() => User, user => user.posts)
+  user: User;
+}
+
+```
+
+> **⚠️ Warning:**  
+> When creating your entities be sure to add `createdAt` field.
+
 ### Step 1: Import the Package and Interfaces
 
 ```typescript
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { factory } from 'nestjs-handler-factory';
+import { Injectable } from '@nestjs/common';
 
+import { InjectRepository } from '@nestjs/typeorm';
+
+//DTOs
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+
+//Entities
 import { Post } from './entities/post.entity';
-import { IQuery } from './interfaces/query.interface';
+
+//Package
+import { factory, IQuery } from 'nestjs-handler-factory';
 ```
 
 ### Step 2: Define a Service with Repository Injection
@@ -129,17 +191,90 @@ async deletePost(id: string) {
 
 ---
 
+## Controller Setup
+
+Making use of the package, this is what your controller will look like.
+
+```
+import {
+  Get,
+  Post,
+  Body,
+  Query,
+  Patch,
+  Param,
+  Delete,
+  Controller,
+} from '@nestjs/common';
+
+import { PostService } from './post.service';
+import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
+
+import { IQuery } from 'nest-typeorm-factory';
+
+@Controller('posts')
+export class PostController {
+  constructor(private readonly postService: PostService) {}
+
+  @Post()
+  async create(@Body() createPostDto: CreatePostDto) {
+    return this.postService.create(createPostDto);
+  }
+
+  @Get()
+  async findAll(@Query() query: IQuery) {
+    return this.postService.findAll(query);
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string, @Query() query: IQuery) {
+    return this.postService.findOne(id, query);
+  }
+
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
+    return this.postService.update(id, updatePostDto);
+  }
+
+  @Delete(':id')
+  async remove(@Param('id') id: string) {
+    return this.postService.remove(id);
+  }
+}
+
+```
+
 ## Advanced Query Options
 
 Each function supports a set of advanced query options, which include filtering, sorting, pagination, and more.
 
 ### Filtering
 
-Filter results based on fields, with advanced options like greater than, less than, and exact match.
+Filter results based on fields that are an exact match.
 
 ```typescript
 GET /posts?title=NestJS
-GET /posts?gt=age,18&status=active
+```
+
+### Advanced Filtering
+
+Filter results with advanced options like greater than, less than, greater than or equals, less than or equals.
+
+```typescript
+GET /posts?gt=reposts,50
+```
+
+```typescript
+GET /posts?gte=reposts,50
+```
+
+```typescript
+GET /posts?lt=reposts,50
+```
+
+```typescript
+GET /posts?lte=reposts,50
 ```
 
 ### Sorting
@@ -147,8 +282,17 @@ GET /posts?gt=age,18&status=active
 Sort records using `asc-fieldName` or `desc-fieldName`.
 
 ```typescript
-GET /posts?sort=asc-title,desc-createdAt
+GET /posts?sort=asc-title
 ```
+
+OR
+
+```typescript
+GET /posts?sort=desc-createdAt
+```
+
+> **⚠️ Note:**  
+> If no sort parameter is passed in, it will sort by the `createdAt` property by default.
 
 ### Field Selection
 
@@ -168,18 +312,68 @@ GET /posts?page=2&limit=5
 
 ### Searching
 
-Use the `search` parameter to match keywords.
+Use the `search` parameter to match keywords like so.
 
 ```typescript
-GET /posts?search=title,JavaScript
+GET /posts?search=fieldA,searchTermA
+```
+
+```typescript
+GET /posts?search=title,JavaScri
+```
+
+### Multiple Field Searching
+
+You can also search against multiple fields.
+
+```typescript
+GET /posts?search=fieldA,searchTermA-fieldB,searchTermB
+```
+
+```typescript
+GET /posts?search=title,JavaScri-content,variables
 ```
 
 ### Range Queries
 
-Retrieve records within a range.
+Retrieve records that have the value of a particular field within a range.
 
 ```typescript
-GET /posts?range=createdAt,2023-01-01-2023-12-31
+GET /posts?range=reposts,5-50
+```
+
+### Populate Relationship
+
+Populate Inter Table relationships while querying records. This works for all kinds of relationships, i.e `One-To-One`, `Many-To-One`, `One-To-Many` and `Many-To-Many`
+
+```typescript
+GET /posts?relations=user
+```
+
+### Populate Multiple Relationships
+
+Supposing our entity has multiple relationships with other tables. This is how we'll do it
+
+```typescript
+GET /posts?relations=user,fieldB,fieldC
+```
+
+The same also works for getting a resource by id
+
+```typescript
+GET /posts/{id}?relations=user
+```
+
+```typescript
+GET /posts/{id}?relations=user,fieldB,fieldC
+```
+
+### Combining Multiple API Features
+
+You can combine multiple API features together like so
+
+```typescript
+GET /posts?title=JavaScri&reposts=5&relations=user&page=2&sort=desc-createdAt
 ```
 
 ---
@@ -208,6 +402,7 @@ Content-Type: application/json
 {
   "title": "My NestJS Post",
   "content": "Exploring the nestjs-handler-factory package."
+  "userId": "67890"
 }
 ```
 
@@ -220,6 +415,11 @@ Content-Type: application/json
     "id": "12345",
     "title": "My NestJS Post",
     "content": "Exploring the nestjs-handler-factory package."
+    "user": {
+      "id": "67890",
+      "name": "John Doe",
+      "email": "johndoe@example.com"
+    }
   }
 }
 ```
