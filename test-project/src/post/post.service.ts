@@ -7,8 +7,10 @@ import { Repository } from 'typeorm';
 
 import { Post } from './entities/post.entity';
 
-import { IQuery } from 'nest-handler-factory';
-import * as factory from 'src/utils/handlerFactory';
+// import { IQuery } from 'nest-handler-factory';
+// import * as factory from 'src/utils/handlerFactory';
+
+import { IQuery, factory } from 'nest-typeorm-factory';
 
 @Injectable()
 export class PostService {

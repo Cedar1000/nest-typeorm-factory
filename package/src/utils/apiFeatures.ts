@@ -8,6 +8,7 @@ import advancedFilter from './advancedFilter';
 
 class APIFeatures implements APIFeaturesInterface {
   query: Partial<IQuery>;
+  columns: string[];
   payload: Partial<IPayload> = {
     skip: 10,
     take: 10,
@@ -16,12 +17,19 @@ class APIFeatures implements APIFeaturesInterface {
     select: [],
   };
 
-  constructor(query: Partial<IQuery>) {
+  constructor(query: Partial<IQuery>, columns: string[]) {
     this.query = query;
+    this.columns = columns;
   }
 
   filter(): this {
     const queryObj = { ...this.query };
+
+    const properties = this.columns.reduce((acc, column) => {
+      acc[column] = column;
+      return acc;
+    }, {});
+
     const excludedFields = [
       'gt',
       'lt',
@@ -38,9 +46,16 @@ class APIFeatures implements APIFeaturesInterface {
 
     excludedFields.forEach((el) => delete queryObj[el]);
 
+    // Filter out fields that are not a property of the Entity
+    Object.keys(queryObj).forEach((el) => {
+      if (!properties[el]) delete queryObj[el];
+    });
+
     // 1B)Advanced Filtering
 
     const filter = generateApiFilter(queryObj);
+
+    // console.log({ filter });
 
     this.payload.where = filter;
 
@@ -135,6 +150,7 @@ class APIFeatures implements APIFeaturesInterface {
 
   range(): this {
     // ?range=age,3-10
+
     if (this.query.range) {
       const [term, range] = this.query.range.split(',');
 

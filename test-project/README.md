@@ -17,14 +17,8 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Repository } from 'typeorm';
 import { Post } from './entities/post.entity';
-import {
-  createOne,
-  getAll,
-  getOne,
-  updateOneOne,
-  deleteOne,
-} from 'handlerFactory';
-import IQuery from 'interfaces/query.Interface';
+
+import { factory, IQuery } from 'nest-typeorm-factory';
 ```
 
 1. `@nestjs/common` and `@nestjs/typeorm` are imports from the NestJS framework, used for creating a service and working with TypeORM repositories.
@@ -51,7 +45,7 @@ This function creates a new record in the repository with the provided payload.
 
 ```typescript
 async create(createPostDto: CreatePostDto) {
-  return createOne(this.postRepository, createPostDto);
+  return factory.createOne(this.postRepository, createPostDto);
 }
 ```
 
@@ -64,11 +58,11 @@ This Operation retrieves a list of records from a repository based on the provid
 
 ```typescript
 async findAll(query: Partial<IQuery>) {
-  return getAll(this.postRepository, query);
+  return factory.getAll(this.postRepository, query);
 }
 ```
 
-1. The `findAll` method accepts a `query` object of type `Partial<IQuery)`. This object contains query parameters for filtering, sorting, and pagination.
+1. The `findAll` method accepts a `query` object of type `IQuery)`. This object contains query parameters for filtering, sorting, and pagination.
 2. The method uses the `getAll` function from the `nestjs-handler-factory` package to retrieve a list of post records based on the provided query.
 
 ### Frontend Usage of the
@@ -93,7 +87,7 @@ This function retrieves a single record from a repository by its ID.
 
 ```typescript
 findOne(id: string) {
-  return getOne(this.postRepository, id);
+  return factory.getOne(this.postRepository, id);
 }
 ```
 
@@ -106,7 +100,7 @@ This function updates an existing record in the repository based on its ID.
 
 ```typescript
 update(id: string, updatePostDto: UpdatePostDto) {
-  return updateOneOne(this.postRepository, id, updatePostDto);
+  return factory.updateOneOne(this.postRepository, id, updatePostDto);
 }
 ```
 
@@ -119,7 +113,7 @@ This function deletes a record from the repository based on its ID.
 
 ```typescript
 remove(id: string) {
-  return deleteOne(this.postRepository, id);
+  return factory.deleteOne(this.postRepository, id);
 }
 ```
 

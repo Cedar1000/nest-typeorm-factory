@@ -6,13 +6,18 @@ import IPayload from '../interfaces/payload.Interface';
 import { NotFoundException } from '@nestjs/common';
 
 export const getAll = async (Repo: any, query: Partial<IQuery>) => {
-  console.log(Repo);
-  const payload: Partial<IPayload> = new APIFeatures(query)
+  const columns = Repo.metadata.columns.map((el) => el.propertyName);
+  const payload: Partial<IPayload> = new APIFeatures(query, columns)
     .filter()
     .sort()
     .limitFields()
     .paginate()
     .search()
+    .gt()
+    .lt()
+    .gte()
+    .lte()
+    .range()
     .relations().payload;
 
   // console.log(JSON.stringify(payload));

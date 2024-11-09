@@ -3,8 +3,9 @@ import IQuery from '../interfaces/query.Interface';
 import IPayload from '../interfaces/payload.Interface';
 declare class APIFeatures implements APIFeaturesInterface {
     query: Partial<IQuery>;
+    columns: string[];
     payload: Partial<IPayload>;
-    constructor(query: Partial<IQuery>);
+    constructor(query: Partial<IQuery>, columns: string[]);
     filter(): this;
     sort(): this;
     limitFields(): this;

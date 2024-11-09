@@ -4,7 +4,7 @@ const typeorm_1 = require("typeorm");
 const generateApiFilter_1 = require("./generateApiFilter");
 const advancedFilter_1 = require("./advancedFilter");
 class APIFeatures {
-    constructor(query) {
+    constructor(query, columns) {
         this.payload = {
             skip: 10,
             take: 10,
@@ -13,9 +13,14 @@ class APIFeatures {
             select: [],
         };
         this.query = query;
+        this.columns = columns;
     }
     filter() {
         const queryObj = { ...this.query };
+        const properties = this.columns.reduce((acc, column) => {
+            acc[column] = column;
+            return acc;
+        }, {});
         const excludedFields = [
             'gt',
             'lt',
@@ -30,6 +35,10 @@ class APIFeatures {
             'relations',
         ];
         excludedFields.forEach((el) => delete queryObj[el]);
+        Object.keys(queryObj).forEach((el) => {
+            if (!properties[el])
+                delete queryObj[el];
+        });
         const filter = (0, generateApiFilter_1.default)(queryObj);
         this.payload.where = filter;
         return this;

@@ -4,13 +4,18 @@ exports.deleteOne = exports.updateOneOne = exports.createOne = exports.getOne = 
 const apiFeatures_1 = require("./apiFeatures");
 const common_1 = require("@nestjs/common");
 const getAll = async (Repo, query) => {
-    console.log(Repo);
-    const payload = new apiFeatures_1.default(query)
+    const columns = Repo.metadata.columns.map((el) => el.propertyName);
+    const payload = new apiFeatures_1.default(query, columns)
         .filter()
         .sort()
         .limitFields()
         .paginate()
         .search()
+        .gt()
+        .lt()
+        .gte()
+        .lte()
+        .range()
         .relations().payload;
     const limit = query.limit ? +query.limit : 10;
     const page = query.page ? +query.page : 1;

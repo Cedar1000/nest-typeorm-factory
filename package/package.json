@@ -1,5 +1,5 @@
 {
-  "name": "nest-handler-factory",
+  "name": "nest-typeorm-factory",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
