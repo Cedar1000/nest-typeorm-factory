@@ -2,7 +2,7 @@ Here’s a comprehensive documentation for your `nestjs-handler-factory` package
 
 ---
 
-# NestJS Handler Factory Documentation
+# NestJS TypeOrm Factory Documentation
 
 `nestjs-handler-factory` is a utility package designed to streamline CRUD operations and advanced filtering in NestJS applications that use TypeORM. This package provides convenient handler functions for retrieving, creating, updating, and deleting records, with support for filtering, pagination, sorting, field selection and populating inter-table relationships.
 
@@ -119,7 +119,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
 
 //Package
-import { factory, IQuery } from 'nestjs-handler-factory';
+import { factory, IQuery } from 'nestjs-typeorm-factory';
 ```
 
 ### Step 2: Define a Service with Repository Injection
