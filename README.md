@@ -88,6 +88,9 @@ export class Post {
   @Column()
   content: string;
 
+  @Column()
+  category: string;
+
   @Column({ default:0 })
   reposts: number;
 
@@ -254,7 +257,7 @@ Each function supports a set of advanced query options, which include filtering,
 Filter results based on fields that are an exact match.
 
 ```typescript
-GET /posts?title=NestJS
+GET /posts?category=fashion
 ```
 
 ### Advanced Filtering
@@ -275,6 +278,13 @@ GET /posts?lt=reposts,50
 
 ```typescript
 GET /posts?lte=reposts,50
+```
+
+You can also apply the `OR` logic while filtering e.g you want to match all posts with a title of either `sports`, `fashion`, or `tech`.
+Here's how you can do that.
+
+```typescript
+GET /posts?category=sports,fashion,tech
 ```
 
 ### Sorting

@@ -88,6 +88,9 @@ export class Post {
   @Column()
   content: string;
 
+  @Column()
+  category: string;
+
   @Column({ default:0 })
   reposts: number;
 
@@ -131,7 +134,7 @@ export class PostService {
     @InjectRepository(Post) private postRepository: Repository<Post>
   ) {}
 
-  // CRUD operations implemented using factory functions from nest-typeorm-factory
+  // CRUD operations implemented using factory functions from nestjs-typeorm-factory
 }
 ```
 
@@ -254,7 +257,7 @@ Each function supports a set of advanced query options, which include filtering,
 Filter results based on fields that are an exact match.
 
 ```typescript
-GET /posts?title=NestJS
+GET /posts?category=fashion
 ```
 
 ### Advanced Filtering
@@ -275,6 +278,13 @@ GET /posts?lt=reposts,50
 
 ```typescript
 GET /posts?lte=reposts,50
+```
+
+You can also apply the `OR` logic while filtering e.g you want to match all posts with a title of either `sports`, `fashion`, or `tech`.
+Here's how you can do that.
+
+```typescript
+GET /posts?category=sports,fashion,tech
 ```
 
 ### Sorting
@@ -401,7 +411,7 @@ Content-Type: application/json
 
 {
   "title": "My NestJS Post",
-  "content": "Exploring the nest-typeorm-factory package."
+  "content": "Exploring the nestjs-typeorm-factory package."
   "userId": "67890"
 }
 ```
@@ -498,6 +508,6 @@ DELETE /posts/12345
 
 ---
 
-For issues or contributions, visit [GitHub Repository](https://github.com/Cedar1000/nest-typeorm-factory).
+For issues or contributions, visit [GitHub Repository](https://github.com/Cedar1000/nestjs-typeorm-factory).
 
 ---
