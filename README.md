@@ -1,10 +1,10 @@
-Here’s a comprehensive documentation for your `nestjs-typeorm-factory` package, highlighting installation, usage, and case scenarios for all API features.
+Here’s a comprehensive documentation for your `nest-typeorm-factory` package, highlighting installation, usage, and case scenarios for all API features.
 
 ---
 
 # NestJS TypeOrm Factory Documentation
 
-`nestjs-typeorm-factory` is a utility package designed to streamline CRUD operations and advanced filtering in NestJS applications that use TypeORM. This package provides convenient handler functions for retrieving, creating, updating, and deleting records, with support for filtering, pagination, sorting, field selection and populating inter-table relationships.
+`nest-typeorm-factory` is a utility package designed to streamline CRUD operations and advanced filtering in NestJS applications that use TypeORM. This package provides convenient handler functions for retrieving, creating, updating, and deleting records, with support for filtering, pagination, sorting, field selection and populating inter-table relationships.
 
 ---
 
@@ -32,10 +32,10 @@ Here’s a comprehensive documentation for your `nestjs-typeorm-factory` package
 
 ## Installation
 
-To use `nestjs-typeorm-factory` in your NestJS project, install it via npm:
+To use `nest-typeorm-factory` in your NestJS project, install it via npm:
 
 ```bash
-npm install nestjs-typeorm-factory
+npm install nest-typeorm-factory
 ```
 
 Ensure you have TypeORM set up in your project, as it’s required for the package to function with your repositories.
@@ -414,7 +414,7 @@ Content-Type: application/json
   "data": {
     "id": "12345",
     "title": "My NestJS Post",
-    "content": "Exploring the nestjs-typeorm-factory package."
+    "content": "Exploring the nest-typeorm-factory package."
     "user": {
       "id": "67890",
       "name": "John Doe",
@@ -494,7 +494,7 @@ DELETE /posts/12345
 
 ## License
 
-`nestjs-typeorm-factory` is open-source software licensed under the MIT License.
+`nest-typeorm-factory` is open-source software licensed under the MIT License.
 
 ---
 
