@@ -2,7 +2,7 @@ Here’s a comprehensive documentation for your `nestjs-handler-factory` package
 
 ---
 
-# NestJS Handler Factory Documentation
+# NestJS TypeOrm Factory Documentation
 
 `nestjs-handler-factory` is a utility package designed to streamline CRUD operations and advanced filtering in NestJS applications that use TypeORM. This package provides convenient handler functions for retrieving, creating, updating, and deleting records, with support for filtering, pagination, sorting, field selection and populating inter-table relationships.
 
@@ -32,10 +32,10 @@ Here’s a comprehensive documentation for your `nestjs-handler-factory` package
 
 ## Installation
 
-To use `nest-typeorm-factory` in your NestJS project, install it via npm:
+To use `nestjs-handler-factory` in your NestJS project, install it via npm:
 
 ```bash
-npm install nest-typeorm-factory
+npm install nestjs-handler-factory
 ```
 
 Ensure you have TypeORM set up in your project, as it’s required for the package to function with your repositories.
@@ -119,7 +119,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
 
 //Package
-import { factory, IQuery } from 'nest-typeorm-factory';
+import { factory, IQuery } from 'nestjs-typeorm-factory';
 ```
 
 ### Step 2: Define a Service with Repository Injection
@@ -144,7 +144,7 @@ export class PostService {
 Use the `createOne` function to create a new record. This method takes a repository instance and the data to create as arguments.
 
 ```typescript
-async create(createPostDto: CreatePostDto) {
+async createPost(createPostDto: CreatePostDto) {
   return factory.createOne(this.postRepository, createPostDto);
 }
 ```
@@ -154,7 +154,7 @@ async create(createPostDto: CreatePostDto) {
 Retrieve a list of records with advanced query options by using `getAll`.
 
 ```typescript
-async findAll(query: Partial<IQuery>) {
+async getAllPosts(query: IQuery) {
   return factory.getAll(this.postRepository, query);
 }
 ```
@@ -164,8 +164,8 @@ async findAll(query: Partial<IQuery>) {
 Use `getOne` to retrieve a single record by its ID.
 
 ```typescript
-async findOne(id: string) {
-  return factory.getOne(this.postRepository, id);
+async getPostById(id: string, query: IQuery) {
+  return factory.getOne(this.postRepository, id, query);
 }
 ```
 
@@ -174,7 +174,7 @@ async findOne(id: string) {
 Use `updateOne` to update an existing record by its ID.
 
 ```typescript
-async update(id: string, updatePostDto: UpdatePostDto) {
+async updatePost(id: string, updatePostDto: UpdatePostDto) {
   return factory.updateOne(this.postRepository, id, updatePostDto);
 }
 ```
@@ -184,7 +184,7 @@ async update(id: string, updatePostDto: UpdatePostDto) {
 Use `deleteOne` to delete a record by its ID.
 
 ```typescript
-async remove(id: string) {
+async deletePost(id: string) {
   return factory.deleteOne(this.postRepository, id);
 }
 ```

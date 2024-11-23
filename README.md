@@ -154,7 +154,7 @@ async createPost(createPostDto: CreatePostDto) {
 Retrieve a list of records with advanced query options by using `getAll`.
 
 ```typescript
-async getAllPosts(query: Partial<IQuery>) {
+async getAllPosts(query: IQuery) {
   return factory.getAll(this.postRepository, query);
 }
 ```
@@ -164,8 +164,8 @@ async getAllPosts(query: Partial<IQuery>) {
 Use `getOne` to retrieve a single record by its ID.
 
 ```typescript
-async getPostById(id: string) {
-  return factory.getOne(this.postRepository, id);
+async getPostById(id: string, query: IQuery) {
+  return factory.getOne(this.postRepository, id, query);
 }
 ```
 
