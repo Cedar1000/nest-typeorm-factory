@@ -46,17 +46,14 @@ class APIFeatures implements APIFeaturesInterface {
 
     excludedFields.forEach((el) => delete queryObj[el]);
 
+    // Filter out fields that are not a property of the Entity
     Object.keys(queryObj).forEach((el) => {
       if (!properties[el]) delete queryObj[el];
     });
 
-    // Filter out fields that are not a property of the Entity
-
     // 1B)Advanced Filtering
 
     const filter = generateApiFilter(queryObj);
-
-    // console.log({ filter });
 
     this.payload.where = filter;
 

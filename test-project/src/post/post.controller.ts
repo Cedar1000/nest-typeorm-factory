@@ -2,10 +2,10 @@ import {
   Get,
   Post,
   Body,
+  Query,
   Patch,
   Param,
   Delete,
-  Query,
   Controller,
 } from '@nestjs/common';
 
@@ -13,7 +13,8 @@ import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 
-import { IQuery } from 'nest-typeorm-factory';
+// import { IQuery } from 'nest-typeorm-factory';
+import IQuery from 'src/interfaces/query.Interface';
 
 @Controller('posts')
 export class PostController {

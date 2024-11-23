@@ -32,10 +32,10 @@ Here’s a comprehensive documentation for your `nestjs-handler-factory` package
 
 ## Installation
 
-To use `nestjs-handler-factory` in your NestJS project, install it via npm:
+To use `nest-typeorm-factory` in your NestJS project, install it via npm:
 
 ```bash
-npm install nestjs-handler-factory
+npm install nest-typeorm-factory
 ```
 
 Ensure you have TypeORM set up in your project, as it’s required for the package to function with your repositories.
@@ -119,7 +119,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
 
 //Package
-import { factory, IQuery } from 'nestjs-handler-factory';
+import { factory, IQuery } from 'nest-typeorm-factory';
 ```
 
 ### Step 2: Define a Service with Repository Injection
@@ -144,7 +144,7 @@ export class PostService {
 Use the `createOne` function to create a new record. This method takes a repository instance and the data to create as arguments.
 
 ```typescript
-async createPost(createPostDto: CreatePostDto) {
+async create(createPostDto: CreatePostDto) {
   return factory.createOne(this.postRepository, createPostDto);
 }
 ```
@@ -154,7 +154,7 @@ async createPost(createPostDto: CreatePostDto) {
 Retrieve a list of records with advanced query options by using `getAll`.
 
 ```typescript
-async getAllPosts(query: Partial<IQuery>) {
+async findAll(query: Partial<IQuery>) {
   return factory.getAll(this.postRepository, query);
 }
 ```
@@ -164,7 +164,7 @@ async getAllPosts(query: Partial<IQuery>) {
 Use `getOne` to retrieve a single record by its ID.
 
 ```typescript
-async getPostById(id: string) {
+async findOne(id: string) {
   return factory.getOne(this.postRepository, id);
 }
 ```
@@ -174,7 +174,7 @@ async getPostById(id: string) {
 Use `updateOne` to update an existing record by its ID.
 
 ```typescript
-async updatePost(id: string, updatePostDto: UpdatePostDto) {
+async update(id: string, updatePostDto: UpdatePostDto) {
   return factory.updateOne(this.postRepository, id, updatePostDto);
 }
 ```
@@ -184,7 +184,7 @@ async updatePost(id: string, updatePostDto: UpdatePostDto) {
 Use `deleteOne` to delete a record by its ID.
 
 ```typescript
-async deletePost(id: string) {
+async remove(id: string) {
   return factory.deleteOne(this.postRepository, id);
 }
 ```
