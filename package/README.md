@@ -4,7 +4,7 @@ Here’s a comprehensive documentation for your `nestjs-handler-factory` package
 
 # NestJS TypeOrm Factory Documentation
 
-`nestjs-handler-factory` is a utility package designed to streamline CRUD operations and advanced filtering in NestJS applications that use TypeORM. This package provides convenient handler functions for retrieving, creating, updating, and deleting records, with support for filtering, pagination, sorting, field selection and populating inter-table relationships.
+`nestjs-typeorm-factory` is a utility package designed to streamline CRUD operations and advanced filtering in NestJS applications that use TypeORM. This package provides convenient handler functions for retrieving, creating, updating, and deleting records, with support for filtering, pagination, sorting, field selection and populating inter-table relationships.
 
 ---
 
