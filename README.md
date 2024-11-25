@@ -147,7 +147,7 @@ export class PostService {
 Use the `createOne` function to create a new record. This method takes a repository instance and the data to create as arguments.
 
 ```typescript
-async createPost(createPostDto: CreatePostDto) {
+async create(createPostDto: CreatePostDto) {
   return factory.createOne(this.postRepository, createPostDto);
 }
 ```
@@ -157,7 +157,7 @@ async createPost(createPostDto: CreatePostDto) {
 Retrieve a list of records with advanced query options by using `getAll`.
 
 ```typescript
-async getAllPosts(query: IQuery) {
+async findAll(query: IQuery) {
   return factory.getAll(this.postRepository, query);
 }
 ```
@@ -167,7 +167,7 @@ async getAllPosts(query: IQuery) {
 Use `getOne` to retrieve a single record by its ID.
 
 ```typescript
-async getPostById(id: string, query: IQuery) {
+async findOne(id: string, query: IQuery) {
   return factory.getOne(this.postRepository, id, query);
 }
 ```
@@ -177,7 +177,7 @@ async getPostById(id: string, query: IQuery) {
 Use `updateOne` to update an existing record by its ID.
 
 ```typescript
-async updatePost(id: string, updatePostDto: UpdatePostDto) {
+async update(id: string, updatePostDto: UpdatePostDto) {
   return factory.updateOne(this.postRepository, id, updatePostDto);
 }
 ```
@@ -187,7 +187,7 @@ async updatePost(id: string, updatePostDto: UpdatePostDto) {
 Use `deleteOne` to delete a record by its ID.
 
 ```typescript
-async deletePost(id: string) {
+async remove(id: string) {
   return factory.deleteOne(this.postRepository, id);
 }
 ```
@@ -302,7 +302,7 @@ GET /posts?sort=desc-createdAt
 ```
 
 > **⚠️ Note:**  
-> If no sort parameter is passed in, it will sort by the `createdAt` property by default.
+> If no sort parameter is passed in, it will sort by the `createdAt` property in descending order by default.
 
 ### Field Selection
 
