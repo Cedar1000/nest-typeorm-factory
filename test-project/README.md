@@ -1,47 +1,150 @@
-# Package Name: `nestjs-handler-factory`
+Here’s a comprehensive documentation for your `nest-typeorm-factory` package, highlighting installation, usage, and case scenarios for all API features.
 
-## Description
+---
 
-The `nestjs-handler-factory` package provides a set of utility functions for handling common operations in a NestJS application. These operations include retrieving data from a database, creating new records, updating records, and deleting records. The package is designed to work seamlessly with NestJS and is written in TypeScript.
+# NestJS TypeOrm Factory Documentation
 
-## Example Usage
+`nest-typeorm-factory` is a utility package designed to streamline CRUD operations and advanced filtering in NestJS applications that use TypeORM. This package provides convenient handler functions for retrieving, creating, updating, and deleting records, with support for filtering, pagination, sorting, field selection and populating inter-table relationships.
 
-### Importing Required Dependencies
+---
 
-First, you need to import the package and any necessary interfaces.
+## Table of Contents
 
-```typescript
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
-import { Repository } from 'typeorm';
-import { Post } from './entities/post.entity';
+1. [Installation](#installation)
+2. [Usage](#usage)
+3. [API Operations](#api-operations)
+   - [Creating a Record](#creating-a-record)
+   - [Retrieving All Records with Filters](#retrieving-all-records-with-filters)
+   - [Retrieving a Single Record](#retrieving-a-single-record)
+   - [Updating a Record](#updating-a-record)
+   - [Deleting a Record](#deleting-a-record)
+4. [Advanced Query Options](#advanced-query-options)
+   - [Filtering](#filtering)
+   - [Sorting](#sorting)
+   - [Field Selection](#field-selection)
+   - [Pagination](#pagination)
+   - [Searching](#searching)
+   - [Range Queries](#range-queries)
+5. [Error Handling](#error-handling)
+6. [Examples](#examples)
 
-import { factory, IQuery } from 'nest-typeorm-factory';
+---
+
+## Installation
+
+To use `nest-typeorm-factory` in your NestJS project, install it via npm:
+
+```bash
+npm install nest-typeorm-factory
 ```
 
-1. `@nestjs/common` and `@nestjs/typeorm` are imports from the NestJS framework, used for creating a service and working with TypeORM repositories.
-2. `CreatePostDto` and `UpdatePostDto` are DTO (Data Transfer Object) classes used for validating and transforming data when creating and updating posts.
-3. `Repository` is imported from TypeORM and represents the repository for the `Post` entity.
-4. `Post` represents the entity for posts, imported from your application.
-5. `createOne`, `getAll`, `getOne`, `updateOneOne`, and `deleteOne` are functions imported from the `nestjs-handler-factory` package for handling CRUD operations.
-6. `IQuery` is an interface for query parameters, possibly defined in your application.
+Ensure you have TypeORM set up in your project, as it’s required for the package to function with your repositories.
 
-### Creating a NestJS Service
+---
+
+## Usage
+
+Import the package and utilize it within your NestJS service to handle common database operations.
+
+Let's create 2 entities, one for `Post`, the other for `User`
+
+The `User`
+
+```
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Post } from './post.entity';
+
+@Entity()
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  name: string;
+
+  @Column()
+  email: string;
+
+  @OneToMany(() => Post, post => post.user)
+  posts: Post[];
+}
+
+```
+
+The `Post`
+
+```
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { User } from './user.entity';
+
+@Entity()
+export class Post {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  title: string;
+
+  @Column()
+  content: string;
+
+  @Column()
+  category: string;
+
+  @Column({ default:0 })
+  reposts: number;
+
+  @Column({ default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
+  @ManyToOne(() => User, user => user.posts)
+  user: User;
+}
+
+```
+
+> **⚠️ Warning:**  
+> When creating your entities be sure to add `createdAt` field.
+
+### Step 1: Import the Package and Interfaces
+
+```typescript
+import { Repository } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+
+import { InjectRepository } from '@nestjs/typeorm';
+
+//DTOs
+import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
+
+//Entities
+import { Post } from './entities/post.entity';
+
+//Package
+import { factory, IQuery } from 'nestjs-typeorm-factory';
+```
+
+### Step 2: Define a Service with Repository Injection
 
 ```typescript
 @Injectable()
 export class PostService {
-  constructor(@InjectRepository(Post) private postRepository: Repository<Post>) {}
+  constructor(
+    @InjectRepository(Post) private postRepository: Repository<Post>,
+  ) {}
+
+  // CRUD operations implemented using factory functions from nestjs-typeorm-factory
+}
 ```
 
-1. `@Injectable()` is a decorator from NestJS, indicating that the `PostService` class is injectable and can be used as a service.
-2. The `constructor` function initializes the `PostService` class. `@InjectRepository(Post)` injects the `Post` repository into the service, making it available for use within the class.
+---
 
-### Handling the "create" Operation
+## API Operations
 
-This function creates a new record in the repository with the provided payload.
+### Creating a Record
+
+Use the `createOne` function to create a new record. This method takes a repository instance and the data to create as arguments.
 
 ```typescript
 async create(createPostDto: CreatePostDto) {
@@ -49,353 +152,362 @@ async create(createPostDto: CreatePostDto) {
 }
 ```
 
-1. The `create` method accepts a `createPostDto` object, which represents the data for creating a new post.
-2. Inside the method, the `createOne` function from the `nestjs-handler-factory` package is used to create a new post record in the repository. The repository and the data to create are passed as arguments to the function.
+### Retrieving All Records with Filters
 
-### Handling the "findAll" Operation
-
-This Operation retrieves a list of records from a repository based on the provided query parameters.
+Retrieve a list of records with advanced query options by using `getAll`.
 
 ```typescript
-async findAll(query: Partial<IQuery>) {
+async findAll(query: IQuery) {
   return factory.getAll(this.postRepository, query);
 }
 ```
 
-1. The `findAll` method accepts a `query` object of type `IQuery)`. This object contains query parameters for filtering, sorting, and pagination.
-2. The method uses the `getAll` function from the `nestjs-handler-factory` package to retrieve a list of post records based on the provided query.
+### Retrieving a Single Record
 
-### Frontend Usage of the
-
-When integrating your NestJS service with the frontend of your application, you'll need to make API requests with query parameters to customize the data you retrieve. Follow these steps to call query parameters in the frontend:
-
-1. **Construct the API Request**:
-
-   Start by constructing an HTTP request to your NestJS server. The query parameters should be included in this request to customize the data you receive.
-
-2. **Include Query Parameters**:
-
-   Depending on the specific API endpoint and server requirements, you can include query parameters in the URL or request body. For GET requests, append query parameters to the URL like this:
-
-   ```plaintext
-   GET /api/posts?limit=10&page=1&sort=createdAt&fields=title,author&search=keyword
-   ```
-
-### Handling the "findOne" Operation
-
-This function retrieves a single record from a repository by its ID.
+Use `getOne` to retrieve a single record by its ID.
 
 ```typescript
-findOne(id: string) {
-  return factory.getOne(this.postRepository, id);
+async findOne(id: string, query: IQuery) {
+  return factory.getOne(this.postRepository, id, query);
 }
 ```
 
-1. The `findOne` method accepts an `id` of type `string`, representing the unique identifier of the post to retrieve.
-2. Inside the method, the `getOne` function from the `nestjs-handler-factory` package is used to retrieve a single post record by its ID.
+### Updating a Record
 
-### Handling the "update" Operation
-
-This function updates an existing record in the repository based on its ID.
+Use `updateOne` to update an existing record by its ID.
 
 ```typescript
-update(id: string, updatePostDto: UpdatePostDto) {
-  return factory.updateOneOne(this.postRepository, id, updatePostDto);
+async update(id: string, updatePostDto: UpdatePostDto) {
+  return factory.updateOne(this.postRepository, id, updatePostDto);
 }
 ```
 
-1. The `update` method accepts an `id` of type `string`, representing the unique identifier of the post to update, and an `updatePostDto` object containing the data to update in the post.
-2. The method uses the `updateOneOne` function from the `nestjs-handler-factory` package to update an existing post record by its ID.
+### Deleting a Record
 
-### Handling the "remove" Operation
-
-This function deletes a record from the repository based on its ID.
+Use `deleteOne` to delete a record by its ID.
 
 ```typescript
-remove(id: string) {
+async remove(id: string) {
   return factory.deleteOne(this.postRepository, id);
 }
 ```
 
-1. The `remove` method accepts an `id` of type `string`, representing the unique identifier of the post to delete.
-2. The method uses the `deleteOne` function from the `nestjs-handler-factory` package to remove a post record by its ID.
-
-This explains each section of the code and its purpose within the NestJS service. It demonstrates how the `nestjs-handler-factory` package simplify the implementation of common CRUD operations for the `Post` entity.
-
-Below is a comprehensive API documentation in `.md` format for the provided code:
-
 ---
 
-# Post API Documentation
+## Controller Setup
 
-## Overview
+Making use of the package, this is what your controller will look like.
 
-This API allows for managing blog posts, including operations like creating, reading, updating, and deleting posts (CRUD). The API is built using NestJS, TypeORM, and supports advanced querying features such as filtering, sorting, pagination, and searching.
+```
+import {
+  Get,
+  Post,
+  Body,
+  Query,
+  Patch,
+  Param,
+  Delete,
+  Controller,
+} from '@nestjs/common';
 
----
+import { PostService } from './post.service';
+import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 
-## Endpoints
+import { IQuery } from 'nest-typeorm-factory';
 
-### 1. **Create a Post**
+@Controller('posts')
+export class PostController {
+  constructor(private readonly postService: PostService) {}
 
-#### **Endpoint:** `POST /posts`
+  @Post()
+  async create(@Body() createPostDto: CreatePostDto) {
+    return this.postService.create(createPostDto);
+  }
 
-#### **Request Body:**
+  @Get()
+  async findAll(@Query() query: IQuery) {
+    return this.postService.findAll(query);
+  }
 
-```json
-{
-  "title": "string",
-  "body": "string"
+  @Get(':id')
+  async findOne(@Param('id') id: string, @Query() query: IQuery) {
+    return this.postService.findOne(id, query);
+  }
+
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
+    return this.postService.update(id, updatePostDto);
+  }
+
+  @Delete(':id')
+  async remove(@Param('id') id: string) {
+    return this.postService.remove(id);
+  }
 }
+
 ```
 
-#### **Response:**
+## Advanced Query Options
 
-- **Status:** `201 Created`
-- **Body:**
-  ```json
-  {
-    "status": "success",
-    "data": {
-      "id": "string",
-      "title": "string",
-      "body": "string",
-      "createdAt": "date-time"
-    }
-  }
-  ```
+Each function supports a set of advanced query options, which include filtering, sorting, pagination, and more.
 
-### 2. **Get All Posts**
+### Filtering
 
-#### **Endpoint:** `GET /posts`
+Filter results based on fields that are an exact match.
 
-#### **Query Parameters (Optional):**
-
-- **`page`**: Pagination - The page number.
-- **`limit`**: Number of items per page.
-- **`sort`**: Sorting criteria. Example: `asc-title,desc-createdAt`.
-- **`fields`**: Fields to select. Example: `title,createdAt`.
-- **`search`**: Search criteria. Example: `title,keyword`.
-- **`relations`**: Relations to include in the response.
-
-#### **Response:**
-
-- **Status:** `200 OK`
-- **Body:**
-  ```json
-  {
-    "status": "success",
-    "total": "number",
-    "nextPage": "number | null",
-    "prevPage": "number | null",
-    "count": "number",
-    "pages": "number",
-    "currentPage": "number",
-    "data": [
-      {
-        "id": "string",
-        "title": "string",
-        "body": "string",
-        "createdAt": "date-time"
-      }
-    ]
-  }
-  ```
-
-### 3. **Get a Single Post**
-
-#### **Endpoint:** `GET /posts/:id`
-
-#### **Path Parameter:**
-
-- **`id`**: The ID of the post.
-
-#### **Query Parameters (Optional):**
-
-- **`relations`**: Relations to include in the response.
-
-#### **Response:**
-
-- **Status:** `200 OK`
-- **Body:**
-  ```json
-  {
-    "status": "success",
-    "data": {
-      "id": "string",
-      "title": "string",
-      "body": "string",
-      "createdAt": "date-time"
-    }
-  }
-  ```
-
-### 4. **Update a Post**
-
-#### **Endpoint:** `PATCH /posts/:id`
-
-#### **Path Parameter:**
-
-- **`id`**: The ID of the post.
-
-#### **Request Body:**
-
-```json
-{
-  "title": "string",
-  "body": "string"
-}
+```typescript
+GET /posts?category=fashion
 ```
 
-#### **Response:**
+### Advanced Filtering
 
-- **Status:** `200 OK`
-- **Body:**
-  ```json
-  {
-    "status": "success",
-    "data": {
-      "id": "string",
-      "title": "string",
-      "body": "string",
-      "createdAt": "date-time"
-    }
-  }
-  ```
+Filter results with advanced options like greater than, less than, greater than or equals, less than or equals.
 
-### 5. **Delete a Post**
+```typescript
+GET /posts?gt=reposts,50
+```
 
-#### **Endpoint:** `DELETE /posts/:id`
+```typescript
+GET /posts?gte=reposts,50
+```
 
-#### **Path Parameter:**
+```typescript
+GET /posts?lt=reposts,50
+```
 
-- **`id`**: The ID of the post.
+```typescript
+GET /posts?lte=reposts,50
+```
 
-#### **Response:**
+You can also apply the `OR` logic while filtering e.g you want to match all posts with a title of either `sports`, `fashion`, or `tech`.
+Here's how you can do that.
 
-- **Status:** `204 No Content`
+```typescript
+GET /posts?category=sports,fashion,tech
+```
 
----
+### Sorting
 
-## Advanced Query Features
+Sort records using `asc-fieldName` or `desc-fieldName`.
 
-### 1. **Filtering**
+```typescript
+GET /posts?sort=asc-title
+```
 
-You can filter results by including key-value pairs in the query string. The key is the field name and the value is the filter criteria.
+OR
 
-#### **Example:**
+```typescript
+GET /posts?sort=desc-createdAt
+```
 
-`GET /posts?title=NestJS`
+> **⚠️ Note:**  
+> If no sort parameter is passed in, it will sort by the `createdAt` property in descending order by default.
 
-### 2. **Sorting**
+### Field Selection
 
-You can sort results using the `sort` parameter. To sort in ascending order, use `asc-fieldName`; for descending, use `desc-fieldName`.
+Limit the fields returned by specifying `fields`.
 
-#### **Example:**
+```typescript
+GET /posts?fields=title,createdAt
+```
 
-`GET /posts?sort=asc-title,desc-createdAt`
+### Pagination
 
-### 3. **Field Limiting**
+Control pagination with `page` and `limit`.
 
-You can limit the fields returned by specifying them in the `fields` parameter.
+```typescript
+GET /posts?page=2&limit=5
+```
 
-#### **Example:**
+### Searching
 
-`GET /posts?fields=title,createdAt`
+Use the `search` parameter to match keywords like so.
 
-### 4. **Pagination**
+```typescript
+GET /posts?search=fieldA,searchTermA
+```
 
-Use the `page` and `limit` parameters for pagination.
+```typescript
+GET /posts?search=title,JavaScri
+```
 
-#### **Example:**
+### Multiple Field Searching
 
-`GET /posts?page=2&limit=5`
+You can also search against multiple fields.
 
-### 5. **Searching**
+```typescript
+GET /posts?search=fieldA,searchTermA-fieldB,searchTermB
+```
 
-The `search` parameter allows you to perform partial matches across multiple fields.
+```typescript
+GET /posts?search=title,JavaScri-content,variables
+```
 
-#### **Example:**
+### Range Queries
 
-`GET /posts?search=title,NestJS`
+Retrieve records that have the value of a particular field within a range.
 
-### 6. **Relations**
+```typescript
+GET /posts?range=reposts,5-50
+```
 
-The `relations` parameter allows you to include related entities.
+### Populate Relationship
 
-#### **Example:**
+Populate Inter Table relationships while querying records. This works for all kinds of relationships, i.e `One-To-One`, `Many-To-One`, `One-To-Many` and `Many-To-Many`
 
-`GET /posts?relations=comments`
+```typescript
+GET /posts?relations=user
+```
+
+### Populate Multiple Relationships
+
+Supposing our entity has multiple relationships with other tables. This is how we'll do it
+
+```typescript
+GET /posts?relations=user,fieldB,fieldC
+```
+
+The same also works for getting a resource by id
+
+```typescript
+GET /posts/{id}?relations=user
+```
+
+```typescript
+GET /posts/{id}?relations=user,fieldB,fieldC
+```
+
+### Combining Multiple API Features
+
+You can combine multiple API features together like so
+
+```typescript
+GET /posts?title=JavaScri&reposts=5&relations=user&page=2&sort=desc-createdAt
+```
 
 ---
 
 ## Error Handling
 
-### Common Errors:
+The package provides consistent error handling with descriptive messages for missing records, invalid parameters, and other common issues.
 
-1. **404 Not Found:**
+### Common Errors
 
-   - **Message:** `No resource with that ID`
-   - **Cause:** The resource with the provided ID does not exist.
-
-2. **400 Bad Request:**
-   - **Message:** `Invalid query parameters`
-   - **Cause:** Provided query parameters are not valid.
+1. **404 Not Found** - Record does not exist.
+2. **400 Bad Request** - Invalid parameters provided.
 
 ---
 
-## Response Structure
+## Examples
 
-All successful responses follow this structure:
+### Create Post
+
+#### Request
+
+```http
+POST /posts
+Content-Type: application/json
+
+{
+  "title": "My NestJS Post",
+  "content": "Exploring the nestjs-typeorm-factory package."
+  "userId": "67890"
+}
+```
+
+#### Response
 
 ```json
 {
   "status": "success",
-  "data": {...} // Response data specific to the operation
+  "data": {
+    "id": "12345",
+    "title": "My NestJS Post",
+    "content": "Exploring the nest-typeorm-factory package."
+    "user": {
+      "id": "67890",
+      "name": "John Doe",
+      "email": "johndoe@example.com"
+    }
+  }
 }
 ```
 
-In case of errors:
+### Get All Posts with Filters
+
+#### Request
+
+```http
+GET /posts?sort=asc-title&page=1&limit=10&search=title,NestJS
+```
+
+#### Response
 
 ```json
 {
-  "status": "error",
-  "message": "Error message"
+  "status": "success",
+  "data": [
+    {
+      "id": "12345",
+      "title": "My NestJS Post",
+      "createdAt": "2023-11-01T10:00:00Z"
+    }
+  ]
+}
+```
+
+### Update Post
+
+#### Request
+
+```http
+PATCH /posts/12345
+Content-Type: application/json
+
+{
+  "title": "Updated NestJS Post Title"
+}
+```
+
+#### Response
+
+```json
+{
+  "status": "success",
+  "data": {
+    "id": "12345",
+    "title": "Updated NestJS Post Title",
+    "updatedAt": "2023-11-01T10:30:00Z"
+  }
+}
+```
+
+### Delete Post
+
+#### Request
+
+```http
+DELETE /posts/12345
+```
+
+#### Response
+
+```json
+{
+  "status": "success",
+  "message": "Post deleted successfully"
 }
 ```
 
 ---
 
-## Technologies Used
-
-- **NestJS**: Backend framework
-- **TypeORM**: ORM for managing database interactions
-- **MySQL**: Database management system
-- **TypeScript**: Programming language used for development
-
----
-
-## Getting Started
-
-To run the API locally, follow these steps:
-
-1. Clone the repository.
-2. Install dependencies using `npm install`.
-3. Configure environment variables for the database.
-4. Run the application using `npm run start:dev`.
-
----
-
-This documentation provides a detailed overview of the Post API, including available endpoints, query options, error handling, and setup instructions.
-
----
-
-## APIFeatures Class
-
-The package also provides an `APIFeatures` class, which is used internally to process and filter query parameters. Users of the package generally do not need to interact directly with this class, but it can be extended or modified as needed.
-
 ## License
 
-## Issues and Contributions
+`nest-typeorm-factory` is open-source software licensed under the MIT License.
 
-If you encounter any issues or have suggestions for improvements, please report them on the GitHub repository: [nestjs-handler-factory](https://github.com/Cedar1000/nestjs-handler-factory/issues).
+---
+
+For issues or contributions, visit [GitHub Repository](https://github.com/Cedar1000/nestjs-typeorm-factory).
+
+---
