@@ -118,7 +118,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { Post } from './entities/post.entity';
 
 //Package
-import { factory, IQuery } from 'nestjs-typeorm-factory';
+import { factory, IQuery } from 'nest-typeorm-factory';
 ```
 
 ### Step 2: Define a Service with Repository Injection
@@ -407,7 +407,7 @@ Content-Type: application/json
 
 {
   "title": "My NestJS Post",
-  "content": "Exploring the nestjs-typeorm-factory package."
+  "content": "Exploring the nest-typeorm-factory package."
   "userId": "67890"
 }
 ```
@@ -504,6 +504,6 @@ DELETE /posts/12345
 
 ---
 
-For issues or contributions, visit [GitHub Repository](https://github.com/Cedar1000/nestjs-typeorm-factory).
+For issues or contributions, visit [GitHub Repository](https://github.com/Cedar1000/nest-typeorm-factory).
 
 ---
