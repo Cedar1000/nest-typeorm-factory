@@ -1,7 +1,3 @@
-Here’s a comprehensive documentation for your `nest-typeorm-factory` package, highlighting installation, usage, and case scenarios for all API features.
-
----
-
 # NestJS TypeOrm Factory Documentation
 
 `nest-typeorm-factory` is a utility package designed to streamline CRUD operations and advanced filtering in NestJS applications that use TypeORM. This package provides convenient handler functions for retrieving, creating, updating, and deleting records, with support for filtering, pagination, sorting, field selection and populating inter-table relationships.
