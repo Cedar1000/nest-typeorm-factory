@@ -1,172 +1,186 @@
-import { Between } from 'typeorm';
+import { Between } from "typeorm"
 
-import APIFeaturesInterface from '../interfaces/apiFeatures.Interface';
-import IQuery from '../interfaces/query.Interface';
-import IPayload from '../interfaces/payload.Interface';
-import generateApiFilter from './generateApiFilter';
-import advancedFilter from './advancedFilter';
+import APIFeaturesInterface from "../interfaces/apiFeatures.Interface"
+import IQuery from "../interfaces/query.Interface"
+import IPayload from "../interfaces/payload.Interface"
+import generateApiFilter from "./generateApiFilter"
+import advancedFilter from "./advancedFilter"
 
 class APIFeatures implements APIFeaturesInterface {
-  query: Partial<IQuery>;
-  columns: string[];
-  payload: Partial<IPayload> = {
-    skip: 10,
-    take: 10,
-    order: {},
-    where: [],
-    select: [],
-  };
+	query: Partial<IQuery>
+	columns: string[]
+	payload: Partial<IPayload> = {
+		skip: 10,
+		take: 10,
+		order: {},
+		where: [],
+		select: [],
+	}
 
-  constructor(query: Partial<IQuery>, columns: string[]) {
-    this.query = query;
-    this.columns = columns;
-  }
+	constructor(query: Partial<IQuery>, columns: string[]) {
+		this.query = query
+		this.columns = columns
+	}
 
-  filter(): this {
-    const queryObj = { ...this.query };
+	filter(): this {
+		const queryObj = { ...this.query }
 
-    const properties = this.columns.reduce((acc, column) => {
-      acc[column] = column;
-      return acc;
-    }, {});
+		const properties = this.columns.reduce((acc, column) => {
+			acc[column] = column
+			return acc
+		}, {})
 
-    const excludedFields = [
-      'gt',
-      'lt',
-      'gte',
-      'lte',
-      'page',
-      'sort',
-      'range',
-      'limit',
-      'fields',
-      'search',
-      'relations',
-    ];
+		const excludedFields = [
+			"gt",
+			"lt",
+			"gte",
+			"lte",
+			"page",
+			"sort",
+			"range",
+			"limit",
+			"fields",
+			"search",
+			"relations",
+		]
 
-    excludedFields.forEach((el) => delete queryObj[el]);
+		excludedFields.forEach((el) => delete queryObj[el])
 
-    // Filter out fields that are not a property of the Entity
-    Object.keys(queryObj).forEach((el) => {
-      if (!properties[el]) delete queryObj[el];
-    });
+		// Filter out fields that are not a property of the Entity
+		Object.keys(queryObj).forEach((el) => {
+			if (!properties[el]) delete queryObj[el]
+		})
 
-    // 1B)Advanced Filtering
+		// 1B)Advanced Filtering
 
-    const filter = generateApiFilter(queryObj);
+		const filter = generateApiFilter(queryObj)
 
-    // console.log({ filter });
+		// console.log({ filter });
 
-    this.payload.where = filter;
+		this.payload.where = filter
 
-    return this;
-  }
+		return this
+	}
 
-  sort(): this {
-    if (this.query.sort) {
-      const sortBy = this.query.sort.split(',');
+	sort(): this {
+		if (this.query.sort) {
+			const sortBy = this.query.sort.split(",")
 
-      sortBy.forEach((el: string) => {
-        const [order, field] = el.split('-');
-        this.payload.order[field] = order.toUpperCase();
-        this.payload.order.id = order.toUpperCase();
-      });
-    } else {
-      this.payload.order = { createdAt: 'DESC', id: 'DESC' };
-    }
+			sortBy.forEach((el: string) => {
+				const [order, field] = el.split("-")
+				this.payload.order[field] = order.toUpperCase()
+				this.payload.order.id = order.toUpperCase()
+			})
+		} else {
+			const createdAtField =
+				this.columns.find(
+					(el) =>
+						el.toLowerCase().includes("created") &&
+						el.toLowerCase().includes("at")
+				) || "createdAt" // find the field that contains "created" and "at" and return it else return "createdAt"
+			const primaryKeyField =
+				this.columns.find(
+					(el) =>
+						el.toLowerCase() === "id" || el.toLowerCase() === "_id"
+				) || "id" // check if  the column contains "id" or "_id" and return it else return "id"
+			this.payload.order = {
+				[createdAtField]: "DESC",
+				[primaryKeyField]: "DESC",
+			}
+		}
 
-    return this;
-  }
+		return this
+	}
 
-  limitFields(): this {
-    if (this.query.fields) {
-      const fields = this.query.fields.split(',');
-      this.payload.select = fields;
-    }
+	limitFields(): this {
+		if (this.query.fields) {
+			const fields = this.query.fields.split(",")
+			this.payload.select = fields
+		}
 
-    return this;
-  }
+		return this
+	}
 
-  paginate(): this {
-    const page = Number(this.query.page) || 1;
-    const limit = Number(this.query.limit) || 10;
-    const skip = (page - 1) * limit;
+	paginate(): this {
+		const page = Number(this.query.page) || 1
+		const limit = Number(this.query.limit) || 10
+		const skip = (page - 1) * limit
 
-    // page=2&limit=10
-    this.payload.skip = skip;
-    this.payload.take = limit;
+		// page=2&limit=10
+		this.payload.skip = skip
+		this.payload.take = limit
 
-    return this;
-  }
+		return this
+	}
 
-  search(): this {
-    if (this.query.search) {
-      this.payload = advancedFilter(this.payload, this.query, 'search');
-    }
+	search(): this {
+		if (this.query.search) {
+			this.payload = advancedFilter(this.payload, this.query, "search")
+		}
 
-    return this;
-  }
+		return this
+	}
 
-  relations(): this {
-    if (this.query.relations) {
-      const relations = this.query.relations.split(',');
-      this.payload.relations = relations;
-    }
+	relations(): this {
+		if (this.query.relations) {
+			const relations = this.query.relations.split(",")
+			this.payload.relations = relations
+		}
 
-    return this;
-  }
+		return this
+	}
 
-  gt(): this {
-    //?gt=age,5-posts,10
-    if (this.query.gt) {
-      this.payload = advancedFilter(this.payload, this.query, 'gt');
-    }
-    return this;
-  }
+	gt(): this {
+		//?gt=age,5-posts,10
+		if (this.query.gt) {
+			this.payload = advancedFilter(this.payload, this.query, "gt")
+		}
+		return this
+	}
 
-  lt(): this {
-    //?gt=age,5-posts,10
-    if (this.query.lt) {
-      this.payload = advancedFilter(this.payload, this.query, 'lt');
-    }
-    return this;
-  }
+	lt(): this {
+		//?gt=age,5-posts,10
+		if (this.query.lt) {
+			this.payload = advancedFilter(this.payload, this.query, "lt")
+		}
+		return this
+	}
 
-  gte(): this {
-    //?gt=age,5-posts,10
-    if (this.query.gte) {
-      this.payload = advancedFilter(this.payload, this.query, 'gte');
-    }
-    return this;
-  }
+	gte(): this {
+		//?gt=age,5-posts,10
+		if (this.query.gte) {
+			this.payload = advancedFilter(this.payload, this.query, "gte")
+		}
+		return this
+	}
 
-  lte(): this {
-    //?gt=age,5-posts,10
-    if (this.query.lte) {
-      this.payload = advancedFilter(this.payload, this.query, 'lte');
-    }
-    return this;
-  }
+	lte(): this {
+		//?gt=age,5-posts,10
+		if (this.query.lte) {
+			this.payload = advancedFilter(this.payload, this.query, "lte")
+		}
+		return this
+	}
 
-  range(): this {
-    // ?range=age,3-10
+	range(): this {
+		// ?range=age,3-10
 
-    if (this.query.range) {
-      const [term, range] = this.query.range.split(',');
+		if (this.query.range) {
+			const [term, range] = this.query.range.split(",")
 
-      const [lowerRange, upperRange] = range.split('-');
+			const [lowerRange, upperRange] = range.split("-")
 
-      const clone = [...this.payload.where];
+			const clone = [...this.payload.where]
 
-      const result = clone.map((el) => ({
-        ...el,
-        [term]: Between(+lowerRange, +upperRange),
-      }));
+			const result = clone.map((el) => ({
+				...el,
+				[term]: Between(+lowerRange, +upperRange),
+			}))
 
-      this.payload.where = result;
-    }
-    return this;
-  }
+			this.payload.where = result
+		}
+		return this
+	}
 }
 
-export default APIFeatures;
+export default APIFeatures
