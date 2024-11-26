@@ -13,18 +13,18 @@ Here’s a comprehensive documentation for your `nest-typeorm-factory` package, 
 1. [Installation](#installation)
 2. [Usage](#usage)
 3. [API Operations](#api-operations)
-   - [Creating a Record](#creating-a-record)
-   - [Retrieving All Records with Filters](#retrieving-all-records-with-filters)
-   - [Retrieving a Single Record](#retrieving-a-single-record)
-   - [Updating a Record](#updating-a-record)
-   - [Deleting a Record](#deleting-a-record)
+    - [Creating a Record](#creating-a-record)
+    - [Retrieving All Records with Filters](#retrieving-all-records-with-filters)
+    - [Retrieving a Single Record](#retrieving-a-single-record)
+    - [Updating a Record](#updating-a-record)
+    - [Deleting a Record](#deleting-a-record)
 4. [Advanced Query Options](#advanced-query-options)
-   - [Filtering](#filtering)
-   - [Sorting](#sorting)
-   - [Field Selection](#field-selection)
-   - [Pagination](#pagination)
-   - [Searching](#searching)
-   - [Range Queries](#range-queries)
+    - [Filtering](#filtering)
+    - [Sorting](#sorting)
+    - [Field Selection](#field-selection)
+    - [Pagination](#pagination)
+    - [Searching](#searching)
+    - [Range Queries](#range-queries)
 5. [Error Handling](#error-handling)
 6. [Examples](#examples)
 
@@ -109,20 +109,20 @@ export class Post {
 ### Step 1: Import the Package and Interfaces
 
 ```typescript
-import { Repository } from 'typeorm';
-import { Injectable } from '@nestjs/common';
+import { Repository } from "typeorm"
+import { Injectable } from "@nestjs/common"
 
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from "@nestjs/typeorm"
 
 //DTOs
-import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
+import { CreatePostDto } from "./dto/create-post.dto"
+import { UpdatePostDto } from "./dto/update-post.dto"
 
 //Entities
-import { Post } from './entities/post.entity';
+import { Post } from "./entities/post.entity"
 
 //Package
-import { factory, IQuery } from 'nestjs-typeorm-factory';
+import { factory, IQuery } from "nest-typeorm-factory"
 ```
 
 ### Step 2: Define a Service with Repository Injection
@@ -130,11 +130,11 @@ import { factory, IQuery } from 'nestjs-typeorm-factory';
 ```typescript
 @Injectable()
 export class PostService {
-  constructor(
-    @InjectRepository(Post) private postRepository: Repository<Post>
-  ) {}
+	constructor(
+		@InjectRepository(Post) private postRepository: Repository<Post>
+	) {}
 
-  // CRUD operations implemented using factory functions from nestjs-typeorm-factory
+	// CRUD operations implemented using factory functions from nest-typeorm-factory
 }
 ```
 
@@ -411,7 +411,7 @@ Content-Type: application/json
 
 {
   "title": "My NestJS Post",
-  "content": "Exploring the nestjs-typeorm-factory package."
+  "content": "Exploring the nest-typeorm-factory package."
   "userId": "67890"
 }
 ```
@@ -446,14 +446,14 @@ GET /posts?sort=asc-title&page=1&limit=10&search=title,NestJS
 
 ```json
 {
-  "status": "success",
-  "data": [
-    {
-      "id": "12345",
-      "title": "My NestJS Post",
-      "createdAt": "2023-11-01T10:00:00Z"
-    }
-  ]
+	"status": "success",
+	"data": [
+		{
+			"id": "12345",
+			"title": "My NestJS Post",
+			"createdAt": "2023-11-01T10:00:00Z"
+		}
+	]
 }
 ```
 
@@ -474,12 +474,12 @@ Content-Type: application/json
 
 ```json
 {
-  "status": "success",
-  "data": {
-    "id": "12345",
-    "title": "Updated NestJS Post Title",
-    "updatedAt": "2023-11-01T10:30:00Z"
-  }
+	"status": "success",
+	"data": {
+		"id": "12345",
+		"title": "Updated NestJS Post Title",
+		"updatedAt": "2023-11-01T10:30:00Z"
+	}
 }
 ```
 
@@ -495,8 +495,8 @@ DELETE /posts/12345
 
 ```json
 {
-  "status": "success",
-  "message": "Post deleted successfully"
+	"status": "success",
+	"message": "Post deleted successfully"
 }
 ```
 
@@ -508,6 +508,6 @@ DELETE /posts/12345
 
 ---
 
-For issues or contributions, visit [GitHub Repository](https://github.com/Cedar1000/nestjs-typeorm-factory).
+For issues or contributions, visit [GitHub Repository](https://github.com/Cedar1000/nest-typeorm-factory).
 
 ---
