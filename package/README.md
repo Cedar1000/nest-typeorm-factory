@@ -148,7 +148,7 @@ Use the `createOne` function to create a new record. This method takes a reposit
 
 ```typescript
 async create(createPostDto: CreatePostDto) {
-  return factory.createOne(this.postRepository, createPostDto);
+  return await factory.createOne(this.postRepository, createPostDto);
 }
 ```
 
@@ -158,7 +158,7 @@ Retrieve a list of records with advanced query options by using `getAll`.
 
 ```typescript
 async findAll(query: IQuery) {
-  return factory.getAll(this.postRepository, query);
+  return await factory.getAll(this.postRepository, query);
 }
 ```
 
@@ -168,7 +168,7 @@ Use `getOne` to retrieve a single record by its ID.
 
 ```typescript
 async findOne(id: string, query: IQuery) {
-  return factory.getOne(this.postRepository, id, query);
+  return await factory.getOne(this.postRepository, id, query);
 }
 ```
 
@@ -178,7 +178,7 @@ Use `updateOne` to update an existing record by its ID.
 
 ```typescript
 async update(id: string, updatePostDto: UpdatePostDto) {
-  return factory.updateOne(this.postRepository, id, updatePostDto);
+  return await factory.updateOne(this.postRepository, id, updatePostDto);
 }
 ```
 
@@ -188,7 +188,7 @@ Use `deleteOne` to delete a record by its ID.
 
 ```typescript
 async remove(id: string) {
-  return factory.deleteOne(this.postRepository, id);
+  return await factory.deleteOne(this.postRepository, id);
 }
 ```
 
