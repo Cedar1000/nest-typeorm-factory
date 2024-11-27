@@ -1,6 +1,6 @@
 {
   "name": "nest-typeorm-factory",
-  "version": "1.0.9",
+  "version": "1.1.1",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +12,7 @@
   "license": "ISC",
   "repository": {
   "type": "git",
-  "url": "https://github.com/Cedar1000/nestjs-typeorm-factory"
+  "url": "https://github.com/Cedar1000/nest-typeorm-factory"
 },
   "dependencies": {
     "@nestjs/common": "^10.4.3",

@@ -130,7 +130,7 @@ export class PostService {
     @InjectRepository(Post) private postRepository: Repository<Post>,
   ) {}
 
-  // CRUD operations implemented using factory functions from nestjs-typeorm-factory
+  // API operations implemented using factory functions from nestjs-typeorm-factory
 }
 ```
 
@@ -144,7 +144,7 @@ Use the `createOne` function to create a new record. This method takes a reposit
 
 ```typescript
 async create(createPostDto: CreatePostDto) {
-  return factory.createOne(this.postRepository, createPostDto);
+  return await factory.createOne(this.postRepository, createPostDto);
 }
 ```
 
@@ -154,7 +154,7 @@ Retrieve a list of records with advanced query options by using `getAll`.
 
 ```typescript
 async findAll(query: IQuery) {
-  return factory.getAll(this.postRepository, query);
+  return await factory.getAll(this.postRepository, query);
 }
 ```
 
@@ -164,7 +164,7 @@ Use `getOne` to retrieve a single record by its ID.
 
 ```typescript
 async findOne(id: string, query: IQuery) {
-  return factory.getOne(this.postRepository, id, query);
+  return await factory.getOne(this.postRepository, id, query);
 }
 ```
 
@@ -174,7 +174,7 @@ Use `updateOne` to update an existing record by its ID.
 
 ```typescript
 async update(id: string, updatePostDto: UpdatePostDto) {
-  return factory.updateOne(this.postRepository, id, updatePostDto);
+  return await factory.updateOne(this.postRepository, id, updatePostDto);
 }
 ```
 
@@ -184,7 +184,7 @@ Use `deleteOne` to delete a record by its ID.
 
 ```typescript
 async remove(id: string) {
-  return factory.deleteOne(this.postRepository, id);
+  return await factory.deleteOne(this.postRepository, id);
 }
 ```
 
@@ -276,7 +276,7 @@ GET /posts?lt=reposts,50
 GET /posts?lte=reposts,50
 ```
 
-You can also apply the `OR` logic while filtering e.g you want to match all posts with a title of either `sports`, `fashion`, or `tech`.
+You can also apply the `OR` logic while filtering e.g you want to match all posts with a `category` of either `sports`, `fashion`, or `tech`.
 Here's how you can do that.
 
 ```typescript
